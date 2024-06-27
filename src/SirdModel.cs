@@ -8,6 +8,7 @@ namespace monte_carlo_simulation.src {
         readonly HashSet<Person> deceasedIndividuals = [];
         readonly IDisease disease;
         int stepNumber = 0;
+        readonly int individualCount;
         readonly Random random = new();
 
         public SirdSimulator(int individualCount, int initInfectedCount, IDisease disease) {
@@ -15,6 +16,7 @@ namespace monte_carlo_simulation.src {
                 throw new ArgumentException("initial infected count cannot be greater than common individual count");
             }
             this.disease = disease ?? throw new ArgumentNullException(nameof(disease));
+            this.individualCount = individualCount;
 
             for(int index = 0; index < individualCount - initInfectedCount; index++) {
                 susceptibleIndividuals.Add(GeneratePerson(Health.Susceptible));
@@ -26,7 +28,6 @@ namespace monte_carlo_simulation.src {
 
         public void Next() {
             int infectedCount = infectedIndividuals.Count;
-            int susceptibleCount = susceptibleIndividuals.Count;
             if(infectedCount == 0) {
                 return;
             }
@@ -36,7 +37,7 @@ namespace monte_carlo_simulation.src {
             foreach(Person person in infectedIndividuals) {
                 var value = random.NextDouble();
                 bool recovered = value < disease.GetRecoveryCoefficient(person);
-                bool deceased = (1 - value) > disease.GetDeceaseCoefficient(person);
+                bool deceased = (1 - value) < disease.GetDeceaseCoefficient(person);
                 if(recovered) {
                     person.SetHealth(Health.Recovered);
                     recoveredIndividuals.Add(person);
@@ -54,7 +55,8 @@ namespace monte_carlo_simulation.src {
             HashSet<Person> formerSusceptible = [];
             foreach(Person person in susceptibleIndividuals) {
                 var value = random.NextDouble();
-                bool infected = value < disease.GetInfectionCoefficient(person);
+                //TODO fix infected predicate: use the infected count and 
+                bool infected = value < disease.GetInfectionCoefficient(person) * infectedCount / individualCount;
                 if(infected) {
                     person.SetHealth(Health.Infected);
                     infectedIndividuals.Add(person);

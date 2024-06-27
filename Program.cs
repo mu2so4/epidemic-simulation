@@ -2,8 +2,8 @@
 
 using monte_carlo_simulation.src;
 
-static void PrintStats(SirdSimulator simulator) {
-    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", simulator.GetStepNumber(),
+static void PrintStats(SirdSimulator simulator, StreamWriter writetext) {
+    writetext.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", simulator.GetStepNumber(),
         simulator.GetSusceptibleCount(), simulator.GetInfectedCount(),
         simulator.GetRecoveredCount(), simulator.GetDeceasedCount());
 }
@@ -18,9 +18,11 @@ int iterationCount = Convert.ToInt32(Console.ReadLine());
 IDisease disease = new SimpleDisease(infectionCoef, recoverCoef, deceaseCoef);
 SirdSimulator simulator = new(individualCount, initInfectedCount, disease);
 
-PrintStats(simulator);
+using(StreamWriter writetext = new("out.csv")) {
+    PrintStats(simulator, writetext);
 
-for(int index = 0; index < iterationCount; index++) {
-    simulator.Next();
-    PrintStats(simulator);
+    for(int index = 0; index < iterationCount; index++) {
+        simulator.Next();
+        PrintStats(simulator, writetext);
+    }
 }
