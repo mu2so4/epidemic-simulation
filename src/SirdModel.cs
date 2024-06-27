@@ -7,7 +7,7 @@ namespace monte_carlo_simulation.src {
         readonly HashSet<Person> recoveredIndividuals = [];
         readonly HashSet<Person> deceasedIndividuals = [];
         readonly IDisease disease;
-        uint stepNumber = 0;
+        int stepNumber = 0;
         readonly Random random = new();
 
         public SirdSimulator(int individualCount, int initInfectedCount, IDisease disease) {
@@ -79,6 +79,10 @@ namespace monte_carlo_simulation.src {
 
         public int GetDeceasedCount() {
             return deceasedIndividuals.Count;
+        }
+
+        public int GetStepNumber() {
+            return stepNumber;
         }
 
         Person GeneratePerson(Health health) {
