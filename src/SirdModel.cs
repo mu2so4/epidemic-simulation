@@ -1,30 +1,20 @@
 
 
 namespace monte_carlo_simulation.src {
-    class SirdSimulator {
-        readonly HashSet<Person> susceptibleIndividuals = [];
-        readonly HashSet<Person> infectedIndividuals = [];
+    class SirdSimulator(HashSet<Person> people, IDisease disease) {
+        readonly HashSet<Person> allIndividuals = new(people);
+        readonly HashSet<Person> susceptibleIndividuals =
+            new(people.Where(p => p.GetHealth() == Health.Susceptible));
+        
+        readonly HashSet<Person> infectedIndividuals =
+            new(people.Where(p => p.GetHealth() == Health.Infected));
+        
         readonly HashSet<Person> recoveredIndividuals = [];
         readonly HashSet<Person> deceasedIndividuals = [];
-        readonly IDisease disease;
+        readonly IDisease disease = disease;
         int stepNumber = 0;
-        readonly int individualCount;
+        readonly int individualCount = people.Count;
         readonly Random random = new();
-
-        public SirdSimulator(int individualCount, int initInfectedCount, IDisease disease) {
-            if(initInfectedCount > individualCount) {
-                throw new ArgumentException("initial infected count cannot be greater than common individual count");
-            }
-            this.disease = disease ?? throw new ArgumentNullException(nameof(disease));
-            this.individualCount = individualCount;
-
-            for(int index = 0; index < individualCount - initInfectedCount; index++) {
-                susceptibleIndividuals.Add(GeneratePerson(Health.Susceptible));
-            }
-            for(int index = 0; index < initInfectedCount; index++) {
-                infectedIndividuals.Add(GeneratePerson(Health.Infected));
-            }
-        }
 
         public void Next() {
             int infectedCount = infectedIndividuals.Count;
@@ -55,7 +45,6 @@ namespace monte_carlo_simulation.src {
             HashSet<Person> formerSusceptible = [];
             foreach(Person person in susceptibleIndividuals) {
                 var value = random.NextDouble();
-                //TODO fix infected predicate: use the infected count and 
                 bool infected = value < disease.GetInfectionCoefficient(person) * infectedCount / individualCount;
                 if(infected) {
                     person.SetHealth(Health.Infected);
@@ -87,9 +76,8 @@ namespace monte_carlo_simulation.src {
             return stepNumber;
         }
 
-        Person GeneratePerson(Health health) {
-            Gender gender = random.NextDouble() < 0.5 ? Gender.Male : Gender.Female;
-            return new(gender, 25, health);
+        public HashSet<Person> GetIndividuals() {
+            return allIndividuals;
         }
     }
 }
