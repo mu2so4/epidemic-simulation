@@ -1,4 +1,5 @@
 ﻿using monte_carlo_simulation.src;
+using monte_carlo_simulation.src.disease;
 
 static void PrintStats(EpidemicStatiscics statiscics, StreamWriter writetext) {
     writetext.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", statiscics.TimeUnit,
@@ -6,18 +7,23 @@ static void PrintStats(EpidemicStatiscics statiscics, StreamWriter writetext) {
         statiscics.RecoveredCount, statiscics.DeceasedCount);
 }
 
-int individualCount = Convert.ToInt32(Console.ReadLine());
-int initInfectedCount = Convert.ToInt32(Console.ReadLine());
-double infectionCoef = Convert.ToDouble(Console.ReadLine());
-double recoverCoef = Convert.ToDouble(Console.ReadLine());
-double deceaseCoef = Convert.ToDouble(Console.ReadLine());
-int iterationCount = Convert.ToInt32(Console.ReadLine());
+DiseaseFactory factory = new();
+factory.Add("genderless", new SimpleDiseaseProducer());
+factory.Add("gender", new GenderDependentProducer());
 
 const double MALE_PROBABILITY = 0.5;
 
-IDisease disease = new SimpleDisease(infectionCoef, recoverCoef, deceaseCoef);
+int individualCount = Convert.ToInt32(Console.ReadLine());
+int initInfectedCount = Convert.ToInt32(Console.ReadLine());
+int iterationCount = Convert.ToInt32(Console.ReadLine());
+string diseaseModelName = Console.ReadLine()!;
+
+
+IDisease disease = factory.NewInstance(diseaseModelName);
 IIndividualGenerator generator = new SimpleIndividualGenerator(MALE_PROBABILITY);
 SirdSimulator simulator = new(generator.GenerateIndividuals(individualCount - initInfectedCount, initInfectedCount), disease);
+
+var type = simulator.GetType();
 
 List<EpidemicStatiscics> commonStatistics = [];
 List<EpidemicStatiscics> maleStatistics = [];

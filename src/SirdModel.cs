@@ -1,6 +1,7 @@
 
-
 namespace monte_carlo_simulation.src {
+    using disease;
+    
     class SirdSimulator(HashSet<Person> people, IDisease disease) {
         readonly HashSet<Person> allIndividuals = new(people);
         readonly HashSet<Person> susceptibleIndividuals =

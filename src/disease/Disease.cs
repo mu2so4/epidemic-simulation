@@ -1,4 +1,4 @@
-namespace monte_carlo_simulation.src {
+namespace monte_carlo_simulation.src.disease {
     interface IDisease {
         double GetInfectionCoefficient(Person person);
         double GetRecoveryCoefficient(Person person);
