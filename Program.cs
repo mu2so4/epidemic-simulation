@@ -1,10 +1,11 @@
 ﻿using monte_carlo_simulation.src;
 using monte_carlo_simulation.src.disease;
+using ScottPlot;
 
-static void PrintStats(EpidemicStatiscics statiscics, StreamWriter writetext) {
-    writetext.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", statiscics.TimeUnit,
-        statiscics.SusceptibleCount, statiscics.InfectedCount,
-        statiscics.RecoveredCount, statiscics.DeceasedCount);
+static void PlotLine(Plot plot, int[] x, int[] y, string legendText) {
+    var susceptileScatter = plot.Add.Scatter(x, y);
+    susceptileScatter.MarkerSize = 0;
+    susceptileScatter.LegendText = legendText;
 }
 
 DiseaseFactory factory = new();
@@ -37,23 +38,16 @@ for(int index = 0; index <= iterationCount; index++) {
     simulator.Next();
 }
 
-using(StreamWriter writer = new("out-common.csv")) {
-    writer.Write("Time\tSusceptible\tInfected\tRecovered\tDeceased\n");
-    foreach(var stat in commonStatistics) {
-        PrintStats(stat, writer);
-    }
-}
+int[] x = commonStatistics.Select(s => s.TimeUnit).ToArray();
+Plot plot = new();
+plot.Title("Epidemic simulation");
+PlotLine(plot, x, commonStatistics.Select(s => s.SusceptibleCount).ToArray(), "Susceptible");
+PlotLine(plot, x, commonStatistics.Select(s => s.InfectedCount).ToArray(), "Infected");
+PlotLine(plot, x, commonStatistics.Select(s => s.RecoveredCount).ToArray(), "Recovered");
+PlotLine(plot, x, commonStatistics.Select(s => s.DeceasedCount).ToArray(), "Deceased");
 
-using(StreamWriter writer = new("out-male.csv")) {
-    writer.Write("Time\tSusceptible\tInfected\tRecovered\tDeceased\n");
-    foreach(var stat in maleStatistics) {
-        PrintStats(stat, writer);
-    }
-}
+plot.XLabel("Days");
+plot.YLabel("Individuals");
+plot.Legend.IsVisible = true;
+plot.SavePng("quickstart.png", 400, 300);
 
-using(StreamWriter writer = new("out-female.csv")) {
-    writer.Write("Time\tSusceptible\tInfected\tRecovered\tDeceased\n");
-    foreach(var stat in femaleStatistics) {
-        PrintStats(stat, writer);
-    }
-}
