@@ -13,8 +13,6 @@ namespace monte_carlo_simulation.src {
         readonly HashSet<Person> recoveredIndividuals = [];
         readonly HashSet<Person> deceasedIndividuals = [];
         readonly IDisease disease = disease;
-        int stepNumber = 0;
-        readonly int individualCount = people.Count;
         readonly Random random = new();
 
         public void Next() {
@@ -46,7 +44,7 @@ namespace monte_carlo_simulation.src {
             HashSet<Person> formerSusceptible = [];
             foreach(Person person in susceptibleIndividuals) {
                 var value = random.NextDouble();
-                bool infected = value < disease.GetInfectionCoefficient(person) * infectedCount / individualCount;
+                bool infected = value < disease.GetInfectionCoefficient(person) * infectedCount / allIndividuals.Count;
                 if(infected) {
                     person.SetHealth(Health.Infected);
                     infectedIndividuals.Add(person);
@@ -54,27 +52,6 @@ namespace monte_carlo_simulation.src {
                 }
             }
             susceptibleIndividuals.RemoveWhere(formerSusceptible.Contains);
-            stepNumber++;
-        }
-
-        public int GetSusceptibleCount() {
-            return susceptibleIndividuals.Count;
-        }
-
-        public int GetInfectedCount() {
-            return infectedIndividuals.Count;
-        }
-
-        public int GetRecoveredCount() {
-            return recoveredIndividuals.Count;
-        }
-
-        public int GetDeceasedCount() {
-            return deceasedIndividuals.Count;
-        }
-
-        public int GetStepNumber() {
-            return stepNumber;
         }
 
         public HashSet<Person> GetIndividuals() {
