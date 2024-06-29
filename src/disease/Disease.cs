@@ -38,24 +38,21 @@ namespace monte_carlo_simulation.src.disease {
         readonly double femaleRecoveryCoefficient = femaleRecoveryCoefficient;
         readonly double femaleDeceaseCoefficient = femaleDeceaseCoefficient;
 
-        public double GetDeceaseCoefficient(Person person)
-        {
+        public double GetDeceaseCoefficient(Person person) {
             if(person.GetGender() == Gender.Male) {
                 return maleDeceaseCoefficient;
             }
             return femaleDeceaseCoefficient;
         }
 
-        public double GetInfectionCoefficient(Person person)
-        {
+        public double GetInfectionCoefficient(Person person) {
             if(person.GetGender() == Gender.Male) {
                 return maleInfectionCoefficient;
             }
             return femaleInfectionCoefficient;
         }
 
-        public double GetRecoveryCoefficient(Person person)
-        {
+        public double GetRecoveryCoefficient(Person person) {
             if(person.GetGender() == Gender.Male) {
                 return maleRecoveryCoefficient;
             }

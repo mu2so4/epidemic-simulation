@@ -6,6 +6,24 @@ static void PlotLine(Plot plot, int[] x, int[] y, string legendText) {
     var susceptileScatter = plot.Add.Scatter(x, y);
     susceptileScatter.MarkerSize = 0;
     susceptileScatter.LegendText = legendText;
+    susceptileScatter.LineWidth = 5;
+}
+
+static Plot PlotResults(List<EpidemicStatiscics> statiscics, string plotName) {
+    int[] x = statiscics.Select(s => s.TimeUnit).ToArray();
+    Plot plot = new();
+    plot.Title("Epidemic simulation (" + plotName + ")");
+    PlotLine(plot, x, statiscics.Select(s => s.SusceptibleCount).ToArray(), "Susceptible");
+    PlotLine(plot, x, statiscics.Select(s => s.InfectedCount).ToArray(), "Infected");
+    PlotLine(plot, x, statiscics.Select(s => s.RecoveredCount).ToArray(), "Recovered");
+    PlotLine(plot, x, statiscics.Select(s => s.DeceasedCount).ToArray(), "Deceased");
+
+    plot.XLabel("Days");
+    plot.YLabel("Individuals");
+    plot.Legend.IsVisible = true;
+    plot.Legend.Alignment = Alignment.UpperRight;
+    plot.SavePng(plotName + ".png", 1200, 900);
+    return plot;
 }
 
 DiseaseFactory factory = new();
@@ -24,8 +42,6 @@ IDisease disease = factory.NewInstance(diseaseModelName);
 IIndividualGenerator generator = new SimpleIndividualGenerator(MALE_PROBABILITY);
 SirdSimulator simulator = new(generator.GenerateIndividuals(individualCount - initInfectedCount, initInfectedCount), disease);
 
-var type = simulator.GetType();
-
 List<EpidemicStatiscics> commonStatistics = [];
 List<EpidemicStatiscics> maleStatistics = [];
 List<EpidemicStatiscics> femaleStatistics = [];
@@ -38,16 +54,6 @@ for(int index = 0; index <= iterationCount; index++) {
     simulator.Next();
 }
 
-int[] x = commonStatistics.Select(s => s.TimeUnit).ToArray();
-Plot plot = new();
-plot.Title("Epidemic simulation");
-PlotLine(plot, x, commonStatistics.Select(s => s.SusceptibleCount).ToArray(), "Susceptible");
-PlotLine(plot, x, commonStatistics.Select(s => s.InfectedCount).ToArray(), "Infected");
-PlotLine(plot, x, commonStatistics.Select(s => s.RecoveredCount).ToArray(), "Recovered");
-PlotLine(plot, x, commonStatistics.Select(s => s.DeceasedCount).ToArray(), "Deceased");
-
-plot.XLabel("Days");
-plot.YLabel("Individuals");
-plot.Legend.IsVisible = true;
-plot.SavePng("quickstart.png", 400, 300);
-
+PlotResults(commonStatistics, diseaseModelName + "-all");
+PlotResults(maleStatistics, diseaseModelName + "-male");
+PlotResults(femaleStatistics, diseaseModelName + "-female");
